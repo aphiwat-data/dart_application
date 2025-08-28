@@ -74,39 +74,9 @@ Future<void> todayExpenses(int userId) async {
   }
 }
 
-/// Search function
+/// TODO: Implement later
 Future<void> searchExpenses(int userId) async {
-  final url = Uri.parse('http://localhost:3000/expenses/$userId');
-  final response = await http.get(url);
-
-  if (response.statusCode != 200) {
-    print("Error: ${response.statusCode}");
-    return;
-  }
-  final expenses = jsonDecode(response.body) as List;
-
-  stdout.write("Item to search: ");
-  String? search = stdin.readLineSync()?.trim();
-
-  if (search == null || search.isEmpty) {
-    print("No item: $search");
-    return;
-  }
-
-  final results = expenses.where((e) {
-    final item = (e['item'] ?? '').toString().toLowerCase();
-    return item.contains(search.toLowerCase());
-  }).toList();
-
-  if (results.isEmpty) {
-    print("No item: $search");
-  } else {
-    for (var e in results) {
-      final dt = DateTime.parse(e['date']);
-      final dtLocal = dt.toLocal();
-      print("${e['id']}. ${e['item']} : ${e['paid']}฿ : $dtLocal");
-    }
-  }
+  print("Search function not implemented yet.");
 }
 
 Future<void> addExpenses(int userId) async {
