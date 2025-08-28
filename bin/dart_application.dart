@@ -79,9 +79,62 @@ Future<void> searchExpenses(int userId) async {
   print("Search function not implemented yet.");
 }
 
+//Add function
 Future<void> addExpenses(int userId) async {
-  print("Add function not implemented yet.");
+  final url = Uri.parse('http://localhost:3000/expenses/$userId');
+  print("===== Add new item =====");
+
+  stdout.write("Item: ");
+  final item = stdin.readLineSync()?.trim();
+
+  stdout.write("Paid: ");
+  final paidStr = stdin.readLineSync()?.trim();
+
+  if (item == null || item.isEmpty || paidStr == null || paidStr.isEmpty) {
+    print("Invalid input\n");
+    return;
+  }
+
+  final paidAmount = int.tryParse(paidStr);
+  if (paidAmount == null) {
+    print("Please input a valid number for 'Paid'\n");
+    return;
+  }
+
+  final body = json.encode({
+    "user_id": userId,
+    "item": item,
+    "paid": paidAmount,
+  });
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: body,
+    );
+
+    if (response.statusCode == 201) {
+      try {
+        final created = json.decode(response.body);
+        final dt = DateTime.tryParse(created['date']?.toString() ?? "");
+        final dtLocal = dt?.toLocal();
+        print("Inserted!\n"
+            " -> ${created['id'] ?? '-'}."
+            " ${created['item'] ?? item}"
+            " : ${created['paid'] ?? paidAmount}฿"
+            " @ ${dtLocal ?? created['date'] ?? 'N/A'}\n");
+      } catch (_) {
+        print("Inserted!\n");
+      }
+    } else {
+      print("Failed to add expense. Error: ${response.statusCode}\n${response.body}\n");
+    }
+  } catch (e) {
+    print("Network error while adding expense: $e\n");
+  }
 }
+
 
 Future<void> deleteExpenses(int userId) async {
   print("Delete function not implemented yet.");
