@@ -11,7 +11,10 @@ Future<int?> login() async {
   stdout.write("Password: ");
   String? password = stdin.readLineSync()?.trim();
 
-  if (username == null || password == null || username.isEmpty || password.isEmpty) {
+  if (username == null ||
+      password == null ||
+      username.isEmpty ||
+      password.isEmpty) {
     print("Incomplete input");
     return null;
   }
@@ -23,6 +26,7 @@ Future<int?> login() async {
   if (response.statusCode == 200) {
     final result = json.decode(response.body);
     print(result["message"]);
+    print("Welcome ${result["username"]} "); // Welcome Messenger
     return result["userId"];
   } else if (response.statusCode == 401 || response.statusCode == 500) {
     print(response.body);
@@ -45,7 +49,9 @@ Future<void> allExpenses(int userId) async {
     for (var exp in jsonResult) {
       final dt = DateTime.tryParse(exp['date'].toString());
       final dtLocal = dt?.toLocal();
-      print("${exp['id']}. ${exp['item']} : ${exp['paid']}฿ @ ${dtLocal ?? exp['date']}");
+      print(
+        "${exp['id']}. ${exp['item']} : ${exp['paid']}฿ @ ${dtLocal ?? exp['date']}",
+      );
       total += int.tryParse(exp['paid'].toString()) ?? 0;
     }
     print("Total expenses = $total฿");
@@ -65,7 +71,9 @@ Future<void> todayExpenses(int userId) async {
     for (var exp in jsonResult) {
       final dt = DateTime.tryParse(exp['date'].toString());
       final dtLocal = dt?.toLocal();
-      print("${exp['id']}. ${exp['item']} : ${exp['paid']}฿ @ ${dtLocal ?? exp['date']}");
+      print(
+        "${exp['id']}. ${exp['item']} : ${exp['paid']}฿ @ ${dtLocal ?? exp['date']}",
+      );
       total += int.tryParse(exp['paid'].toString()) ?? 0;
     }
     print("Total expenses = $total฿");
