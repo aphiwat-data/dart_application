@@ -134,3 +134,10 @@ Future<void> menuLoop(int userId) async {
 }
 
 /// ==================== Entry Point ====================
+Future<void> main(List<String> arguments) async {
+  print('Hello world: ${dart_application.calculate()}!');
+  final userId = await login();
+  if (userId != null) {
+    await menuLoop(userId);
+  }
+}
