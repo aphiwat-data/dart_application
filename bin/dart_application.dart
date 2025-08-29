@@ -84,15 +84,96 @@ Future<void> todayExpenses(int userId) async {
 
 /// TODO: Implement later
 Future<void> searchExpenses(int userId) async {
-  print("Search function not implemented yet.");
+  print("===== Search Expense =====");
+  stdout.write("Keyword: ");
+  String? keyword = stdin.readLineSync()?.trim();
+
+  if (keyword == null || keyword.isEmpty) {
+    print("No keyword entered");
+    return;
+  }
+
+  final url = Uri.parse(
+    'http://localhost:3000/expenses/$userId/search/$keyword',
+  );
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    final jsonResult = json.decode(response.body) as List;
+    if (jsonResult.isEmpty) {
+      print("No results found for \"$keyword\".");
+      return;
+    }
+
+    print("-------- Search Results --------");
+    for (var exp in jsonResult) {
+      final dt = DateTime.tryParse(exp['date'].toString());
+      final dtLocal = dt?.toLocal();
+      print(
+        "${exp['id']}. ${exp['item']} : ${exp['paid']}฿ @ ${dtLocal ?? exp['date']}",
+      );
+    }
+  } else {
+    print("Failed to search: ${response.body}");
+  }
 }
 
 Future<void> addExpenses(int userId) async {
-  print("Add function not implemented yet.");
+  print("===== Add New Expense =====");
+  stdout.write("Item name: ");
+  String? item = stdin.readLineSync()?.trim();
+  stdout.write("Paid (amount): ");
+  String? paidStr = stdin.readLineSync()?.trim();
+
+  if (item == null || item.isEmpty || paidStr == null || paidStr.isEmpty) {
+    print("Incomplete input");
+    return;
+  }
+
+  final paid = double.tryParse(paidStr);
+  if (paid == null) {
+    print("Invalid amount");
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:3000/expenses/$userId');
+  final response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: json.encode({"item": item, "paid": paid}),
+  );
+
+  if (response.statusCode == 200) {
+    print("Expense added successfully.");
+  } else {
+    print("Failed to add expense: ${response.body}");
+  }
 }
 
 Future<void> deleteExpenses(int userId) async {
-  print("Delete function not implemented yet.");
+  print("===== Delete Expense =====");
+  stdout.write("Enter Expense ID to delete: ");
+  String? idStr = stdin.readLineSync()?.trim();
+
+  if (idStr == null || idStr.isEmpty) {
+    print("No ID entered");
+    return;
+  }
+
+  final id = int.tryParse(idStr);
+  if (id == null) {
+    print("Invalid ID");
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:3000/expenses/$userId/$id');
+  final response = await http.delete(url);
+
+  if (response.statusCode == 200) {
+    print("Expense deleted successfully.");
+  } else {
+    print("Failed to delete: ${response.body}");
+  }
 }
 
 /// ==================== Menu Loop ====================
